@@ -12,3 +12,28 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ===========================================
+// MODELO DE USUARIO
+// ===========================================
+model User {
+  id        Int      @id @default(autoincrement()) // ID único
+  name      String   // Nombre del usuario
+  email     String   @unique // Correo único
+  password  String   // Contraseña encriptada
+  tasks     Task[]   // Relación uno a muchos con tareas
+  createdAt DateTime @default(now()) // Fecha de creación
+}
+
+// ===========================================
+// MODELO DE TAREA
+// ===========================================
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String   @default("pending") // pending | in_progress | done
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime @default(now())
+}
