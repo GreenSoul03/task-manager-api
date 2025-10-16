@@ -21,6 +21,7 @@ model User {
   name      String   // Nombre del usuario
   email     String   @unique // Correo único
   password  String   // Contraseña encriptada
+  role      String   @default("user") // rol de usuario
   tasks     Task[]   // Relación uno a muchos con tareas
   createdAt DateTime @default(now()) // Fecha de creación
 }
