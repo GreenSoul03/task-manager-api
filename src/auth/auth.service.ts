@@ -22,10 +22,14 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
-
     const payload = { sub: user.id, email: user.email };
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  // ✅ Método auxiliar para generar token (usado en register)
+  getJwtToken(payload: any) {
+    return this.jwtService.sign(payload);
   }
 }

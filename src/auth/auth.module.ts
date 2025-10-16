@@ -11,12 +11,12 @@ import { JwtStrategy } from './jwt.strategy';
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'supersecret', // mejor usar env
+      secret: process.env.JWT_SECRET || 'mi_secreto_seguro', // usa el mismo en jwt.strategy.ts
       signOptions: { expiresIn: '1h' },
     }),
-    UsersModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}

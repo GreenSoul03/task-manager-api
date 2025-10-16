@@ -7,13 +7,14 @@ import { PrismaService } from '../database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Crear usuario con contraseña encriptada
-  async create(createUserDto: CreateUserDto) {
+  // 🟢 Crear usuario con contraseña encriptada
+  async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
@@ -24,30 +25,31 @@ export class UsersService {
         },
       });
     } catch (error) {
-      throw new BadRequestException('Error al crear usuario');
+      throw new BadRequestException(
+        error.message || 'Error al crear usuario',
+      );
     }
   }
 
-  // Obtener todos los usuarios
-  async findAll() {
+  // 🟢 Obtener todos los usuarios
+  async findAll(): Promise<User[]> {
     return this.prisma.user.findMany();
   }
 
-  // Obtener usuario por ID
-  async findOne(id: number) {
+  // 🟢 Obtener usuario por ID
+  async findOne(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
     return user;
   }
 
-  // ✅ Nuevo método para buscar usuario por email (usado por AuthService)
-  async findByEmail(email: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    return user;
+  // 🟢 Buscar usuario por email (para login con JWT)
+  async findByEmail(email: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { email } });
   }
 
-  // Actualizar usuario (re-hash si cambia la contraseña)
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  // 🟢 Actualizar usuario (rehash si cambia la contraseña)
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     try {
       if (updateUserDto.password) {
         updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
@@ -57,13 +59,15 @@ export class UsersService {
         where: { id },
         data: updateUserDto,
       });
-    } catch {
-      throw new BadRequestException('Error al actualizar usuario');
+    } catch (error) {
+      throw new BadRequestException(
+        error.message || 'Error al actualizar usuario',
+      );
     }
   }
 
-  // Eliminar usuario
-  async remove(id: number) {
+  // 🟢 Eliminar usuario
+  async remove(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Usuario no encontrado');
 
